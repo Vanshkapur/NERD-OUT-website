@@ -192,6 +192,17 @@ function ArticleCard({ article, revealed, onOpen, onStatus, onRevealStart, onRev
       )}
 
       <div className="card-actions">
+        <a
+          className="article-link-button"
+          href={article.link || '#'}
+          target="_blank"
+          rel="noreferrer"
+          onPointerDown={(event) => event.stopPropagation()}
+          aria-disabled={!article.link}
+        >
+          <span className="article-link-icon" aria-hidden="true">{'\u2197'}</span>
+          Read article
+        </a>
         <button className="summary-button" type="button" onPointerDown={(event) => event.stopPropagation()} onClick={() => onOpen(article)}>Summary</button>
         <button className="ghost-button compact-button" type="button" onPointerDown={(event) => event.stopPropagation()} onClick={() => onStatus(article, 'readLater')}>Later</button>
         <button className="ghost-button compact-button" type="button" onPointerDown={(event) => event.stopPropagation()} onClick={() => onStatus(article, 'read')}>Read</button>
@@ -221,7 +232,7 @@ export default function App() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [cardRevealed, setCardRevealed] = useState(false)
   const [localStatusMap, setLocalStatusMap] = useState(readSavedStatusMap)
-  const viewportRef = useRef(null)
+  const readerRef = useRef(null)
   const revealTimerRef = useRef(null)
 
   useEffect(() => {
@@ -307,22 +318,22 @@ export default function App() {
 
   function startArena() {
     setArenaOpen(true)
-    viewportRef.current?.classList.add('is-arena')
+    readerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   function goHome() {
     setArenaOpen(false)
-    viewportRef.current?.classList.remove('is-arena')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
     <>
       <HomeButton onClick={goHome} hidden={!arenaOpen} />
       <main className="app-shell">
-        <div className="viewport-stack" ref={viewportRef}>
+        <div className="viewport-stack">
           <Hero onStart={startArena} articleCount={orderedArticles.length} />
 
-          <section className="reader-screen" aria-label="Substack reader">
+          <section className="reader-screen" aria-label="Substack reader" ref={readerRef}>
             <div className="reader-layout">
               <section className="cards-section">
                 <div className="stage-header">
